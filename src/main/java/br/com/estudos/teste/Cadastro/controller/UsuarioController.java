@@ -5,7 +5,9 @@ import br.com.estudos.teste.Cadastro.dto.response.UsuarioResponseCompletoDTO;
 import br.com.estudos.teste.Cadastro.dto.response.UsuarioResponseDTO;
 import br.com.estudos.teste.Cadastro.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,5 +29,10 @@ public class UsuarioController {
     @GetMapping
     public List<UsuarioResponseDTO> obterTodosUsuarios(){
         return service.obterUsuario();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UsuarioResponseCompletoDTO> obterUsuarioPorId(@PathVariable long id){
+        return ResponseEntity.ok(service.obterPorId(id));
     }
 }

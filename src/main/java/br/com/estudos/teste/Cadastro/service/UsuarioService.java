@@ -3,6 +3,7 @@ package br.com.estudos.teste.Cadastro.service;
 import br.com.estudos.teste.Cadastro.dto.response.UsuarioResponseCompletoDTO;
 import br.com.estudos.teste.Cadastro.dto.response.UsuarioResponseDTO;
 import br.com.estudos.teste.Cadastro.entity.Usuario;
+import br.com.estudos.teste.Cadastro.exception.CadastroException;
 import br.com.estudos.teste.Cadastro.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,5 +47,19 @@ public class UsuarioService {
                         u.getNome(),
                         u.getRole()))
                 .collect(Collectors.toList());
+    }
+
+    public UsuarioResponseCompletoDTO obterPorId(long id) {
+            Usuario u = repository.findById(id)
+                    .orElseThrow(()-> new CadastroException("Usuario não encostrado"));
+
+        return new UsuarioResponseCompletoDTO(
+                u.getId(),
+                u.getNome(),
+                u.getEmail(),
+                u.getTelefone(),
+                u.getCpf(),
+                u.getRole()
+        );
     }
 }
