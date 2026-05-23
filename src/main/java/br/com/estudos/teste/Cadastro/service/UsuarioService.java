@@ -1,11 +1,14 @@
 package br.com.estudos.teste.Cadastro.service;
 
+import br.com.estudos.teste.Cadastro.dto.request.UsuarioRequestDTO;
 import br.com.estudos.teste.Cadastro.dto.response.UsuarioResponseCompletoDTO;
 import br.com.estudos.teste.Cadastro.dto.response.UsuarioResponseDTO;
 import br.com.estudos.teste.Cadastro.entity.Usuario;
 import br.com.estudos.teste.Cadastro.exception.CadastroException;
 import br.com.estudos.teste.Cadastro.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -61,5 +64,18 @@ public class UsuarioService {
                 u.getCpf(),
                 u.getRole()
         );
+    }
+
+    @Transactional
+    public UsuarioRequestDTO cadastrarUsuario(UsuarioRequestDTO dto) {
+        if (repository.existsByEmail(dto.email())){
+            throw new CadastroException("Email já cadastrado!");
+        }
+
+        Usuario u = new Usuario(dto);
+        return new UsuarioRequestDTO(u.getNome(),
+                u.getTelefone(),
+                u.getEmail(),
+                u.getCpf());
     }
 }

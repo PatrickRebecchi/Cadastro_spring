@@ -1,5 +1,6 @@
 package br.com.estudos.teste.Cadastro.entity;
 
+import br.com.estudos.teste.Cadastro.dto.request.UsuarioRequestDTO;
 import br.com.estudos.teste.Cadastro.entity.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -30,5 +31,12 @@ public class Usuario {
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<Investimento> investimentoList;
+
+    public Usuario(UsuarioRequestDTO dto){
+        this.nome = dto.nome();
+        this.telefone = dto.telefone();
+        this.email = dto.email();
+        this.cpf = dto.cpf();
+    }
 }
 
