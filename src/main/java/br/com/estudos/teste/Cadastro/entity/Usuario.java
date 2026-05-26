@@ -28,6 +28,7 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     private Role role;
     private String email;
+    private String senha;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<Investimento> investimentoList;

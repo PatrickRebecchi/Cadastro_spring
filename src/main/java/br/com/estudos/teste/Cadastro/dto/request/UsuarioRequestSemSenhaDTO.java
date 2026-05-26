@@ -1,13 +1,12 @@
 package br.com.estudos.teste.Cadastro.dto.request;
 
-import br.com.estudos.teste.Cadastro.entity.enums.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.br.CPF;
 
-public record UsuarioRequestDTO(
+public record UsuarioRequestSemSenhaDTO(
+        Long id,
         @NotBlank(message = "Nome obrigatorio")
         String nome,
         @Pattern(
@@ -20,10 +19,6 @@ public record UsuarioRequestDTO(
         String email,
         @NotBlank(message = "CPF obrigatório")
         @CPF(message = "CPF inválido")
-        String cpf,
-        @NotBlank(message = "Senha obrigatória")
-        @Size(min = 6, message = "Senha deve ter no mínimo 6 caracteres")
-        String senha
-
+        String cpf
 ) {
 }

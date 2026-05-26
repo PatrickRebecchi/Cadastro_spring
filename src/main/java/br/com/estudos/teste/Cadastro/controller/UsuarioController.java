@@ -4,6 +4,7 @@ package br.com.estudos.teste.Cadastro.controller;
 import br.com.estudos.teste.Cadastro.dto.request.UsuarioRequestDTO;
 import br.com.estudos.teste.Cadastro.dto.response.UsuarioResponseCompletoDTO;
 import br.com.estudos.teste.Cadastro.dto.response.UsuarioResponseDTO;
+import br.com.estudos.teste.Cadastro.dto.response.UsuarioResponseSenhaDTO;
 import br.com.estudos.teste.Cadastro.entity.Usuario;
 import br.com.estudos.teste.Cadastro.service.UsuarioService;
 import br.com.estudos.teste.Cadastro.util.DateUtil;
@@ -34,6 +35,11 @@ public class UsuarioController {
         return service.buscarCompleto();
     }
 
+    @GetMapping("/completo/senha")
+    public List<UsuarioResponseSenhaDTO> completoComSenha(){
+        return service.buscarCompletoSenha();
+    }
+
     @GetMapping
     public List<UsuarioResponseDTO> obterTodosUsuarios(){
         log.info(dateUtil.formatLocalDateTimeToDatabase(LocalDateTime.now()));
@@ -46,7 +52,7 @@ public class UsuarioController {
     }
 
     @PostMapping("/adc")
-    public ResponseEntity<UsuarioRequestDTO> cadastrarUsuario(@RequestBody @Valid UsuarioRequestDTO dto){
+    public ResponseEntity<UsuarioResponseCompletoDTO > cadastrarUsuario(@RequestBody @Valid UsuarioRequestDTO dto){
         log.info(dateUtil.formatLocalDateTimeToDatabase(LocalDateTime.now()));
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(service.cadastrarUsuario(dto));
