@@ -1,7 +1,9 @@
 package br.com.estudos.teste.Cadastro.controller;
 
 
+import br.com.estudos.teste.Cadastro.dto.request.LoginRequestDTO;
 import br.com.estudos.teste.Cadastro.dto.request.UsuarioRequestDTO;
+import br.com.estudos.teste.Cadastro.dto.response.LoginResponseDTO;
 import br.com.estudos.teste.Cadastro.dto.response.UsuarioResponseCompletoDTO;
 import br.com.estudos.teste.Cadastro.dto.response.UsuarioResponseDTO;
 import br.com.estudos.teste.Cadastro.dto.response.UsuarioResponseSenhaDTO;
@@ -49,6 +51,15 @@ public class UsuarioController {
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioResponseCompletoDTO> obterUsuarioPorId(@PathVariable long id){
         return ResponseEntity.ok(service.obterPorId(id));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDTO> login(
+            @RequestBody LoginRequestDTO dto
+    ){
+        return ResponseEntity.ok(
+                service.login(dto)
+        );
     }
 
     @PostMapping("/adc")
