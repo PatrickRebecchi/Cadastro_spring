@@ -1,15 +1,18 @@
 package br.com.estudos.teste.Cadastro.service;
 
 import br.com.estudos.teste.Cadastro.dto.request.UsuarioRequestDTO;
+import br.com.estudos.teste.Cadastro.dto.request.UsuarioRequestSemSenhaDTO;
 import br.com.estudos.teste.Cadastro.dto.response.UsuarioResponseCompletoDTO;
 import br.com.estudos.teste.Cadastro.dto.response.UsuarioResponseDTO;
+import br.com.estudos.teste.Cadastro.dto.response.UsuarioResponseSenhaDTO;
 import br.com.estudos.teste.Cadastro.entity.Usuario;
 import br.com.estudos.teste.Cadastro.exception.CadastroException;
 import br.com.estudos.teste.Cadastro.repository.UsuarioRepository;
+import br.com.estudos.teste.Cadastro.validation.ValidacaoUsuarioCriar;
+import br.com.estudos.teste.Cadastro.validation.ValidacaoUsuarioCriarCpf;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
-import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,10 +24,37 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository repository;
 
+    @Autowired
+    private List<ValidacaoUsuarioCriar> validacao;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private List<ValidacaoUsuarioCriarCpf> validacaoCPF;
+
     @Transactional
     public List<UsuarioResponseCompletoDTO> buscarCompleto() {
         return converteDadosCompelto(repository.findAll());
     }
+
+    @Transactional
+    public List<UsuarioResponseSenhaDTO> buscarCompletoSenha() {
+        return converteDadosComSenha(repository.findAll());
+    }
+
+    @Transactional
+    public List<UsuarioResponseSenhaDTO> converteDadosComSenha(List<Usuario> usuarios) {
+        return usuarios.stream()
+                .map(u -> new UsuarioResponseSenhaDTO(
+                        u.getId(),
+                        u.getNome(),
+                        u.getEmail(),
+                        u.getCpf(),
+                        u.getSenha()))
+                .collect(Collectors.toList());
+    }
+
 
     @Transactional
     public List<UsuarioResponseCompletoDTO> converteDadosCompelto(List<Usuario> usuarios) {
@@ -48,7 +78,7 @@ public class UsuarioService {
                 .map(u -> new UsuarioResponseDTO(
                         u.getId(),
                         u.getNome(),
-                        u.getRole()))
+                        u.getEmail()))
                 .collect(Collectors.toList());
     }
 
@@ -67,15 +97,26 @@ public class UsuarioService {
     }
 
     @Transactional
-    public UsuarioRequestDTO cadastrarUsuario(UsuarioRequestDTO dto) {
-        if (repository.existsByEmail(dto.email())){
-            throw new CadastroException("Email já cadastrado!");
-        }
+    public UsuarioResponseCompletoDTO cadastrarUsuario(UsuarioRequestDTO dto) {
 
-        Usuario u = new Usuario(dto);
-        return new UsuarioRequestDTO(u.getNome(),
-                u.getTelefone(),
-                u.getEmail(),
-                u.getCpf());
+
+        validacao.forEach(u -> u.validar(dto));
+        validacaoCPF.forEach(u -> u.validar(dto));
+
+        Usuario usuario = new Usuario(dto);
+
+        usuario.setSenha(
+                passwordEncoder.encode(dto.senha())
+        );
+
+        repository.save(usuario);
+        return new UsuarioResponseCompletoDTO(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                usuario.getTelefone(),
+                usuario.getCpf(),
+                usuario.getRole()
+        );
     }
 }
