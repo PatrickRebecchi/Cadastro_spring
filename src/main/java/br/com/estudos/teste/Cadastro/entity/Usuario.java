@@ -4,10 +4,7 @@ import br.com.estudos.teste.Cadastro.dto.request.UsuarioRequestDTO;
 import br.com.estudos.teste.Cadastro.entity.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -17,7 +14,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
+@Data
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

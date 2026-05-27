@@ -3,10 +3,7 @@ package br.com.estudos.teste.Cadastro.service;
 import br.com.estudos.teste.Cadastro.dto.request.LoginRequestDTO;
 import br.com.estudos.teste.Cadastro.dto.request.UsuarioRequestDTO;
 import br.com.estudos.teste.Cadastro.dto.request.UsuarioRequestSemSenhaDTO;
-import br.com.estudos.teste.Cadastro.dto.response.LoginResponseDTO;
-import br.com.estudos.teste.Cadastro.dto.response.UsuarioResponseCompletoDTO;
-import br.com.estudos.teste.Cadastro.dto.response.UsuarioResponseDTO;
-import br.com.estudos.teste.Cadastro.dto.response.UsuarioResponseSenhaDTO;
+import br.com.estudos.teste.Cadastro.dto.response.*;
 import br.com.estudos.teste.Cadastro.entity.Usuario;
 import br.com.estudos.teste.Cadastro.exception.CadastroException;
 import br.com.estudos.teste.Cadastro.repository.UsuarioRepository;
@@ -34,6 +31,16 @@ public class UsuarioService {
 
     @Autowired
     private List<ValidacaoUsuarioCriarCpf> validacaoCPF;
+
+    public String formatarCpf(String cpf) {
+
+        cpf = cpf.replaceAll("\\D", "");
+
+        return cpf.replaceFirst(
+                "(\\d{3})(\\d{3})(\\d{3})(\\d{2})",
+                "$1.$2.$3-$4"
+        );
+    }
 
     @Transactional
     public List<UsuarioResponseCompletoDTO> buscarCompleto() {
@@ -111,6 +118,8 @@ public class UsuarioService {
                 passwordEncoder.encode(dto.senha())
         );
 
+        usuario.setCpf(formatarCpf(usuario.getCpf()));
+
         repository.save(usuario);
         return new UsuarioResponseCompletoDTO(
                 usuario.getId(),
@@ -123,7 +132,7 @@ public class UsuarioService {
     }
 
     @Transactional
-    public LoginResponseDTO login(LoginRequestDTO dto){
+    public LoginResponseMensagemDTO login(LoginRequestDTO dto){
 
         Usuario usuario = repository.findByEmail(dto.email())
                 .orElseThrow(() ->
@@ -139,6 +148,6 @@ public class UsuarioService {
             throw new CadastroException("Senha inválida");
         }
 
-        return new LoginResponseDTO("Login realizado");
+        return new LoginResponseMensagemDTO("Login realizado");
     }
 }

@@ -3,11 +3,9 @@ package br.com.estudos.teste.Cadastro.controller;
 
 import br.com.estudos.teste.Cadastro.dto.request.LoginRequestDTO;
 import br.com.estudos.teste.Cadastro.dto.request.UsuarioRequestDTO;
-import br.com.estudos.teste.Cadastro.dto.response.LoginResponseDTO;
-import br.com.estudos.teste.Cadastro.dto.response.UsuarioResponseCompletoDTO;
-import br.com.estudos.teste.Cadastro.dto.response.UsuarioResponseDTO;
-import br.com.estudos.teste.Cadastro.dto.response.UsuarioResponseSenhaDTO;
+import br.com.estudos.teste.Cadastro.dto.response.*;
 import br.com.estudos.teste.Cadastro.entity.Usuario;
+import br.com.estudos.teste.Cadastro.service.AuthService;
 import br.com.estudos.teste.Cadastro.service.UsuarioService;
 import br.com.estudos.teste.Cadastro.util.DateUtil;
 import jakarta.validation.Valid;
@@ -20,11 +18,15 @@ import org.springframework.web.bind.annotation.*;
 import javax.swing.plaf.PanelUI;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Log4j2
 @RestController
 @RequestMapping("/usuarios")
 public class UsuarioController {
+
+    @Autowired
+    private AuthService authService;
 
     @Autowired
     private DateUtil dateUtil;
@@ -54,7 +56,7 @@ public class UsuarioController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(
+    public ResponseEntity<LoginResponseMensagemDTO> login(
             @RequestBody LoginRequestDTO dto
     ){
         return ResponseEntity.ok(
@@ -67,5 +69,29 @@ public class UsuarioController {
         log.info(dateUtil.formatLocalDateTimeToDatabase(LocalDateTime.now()));
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(service.cadastrarUsuario(dto));
+    }
+
+    @PostMapping("/loginComSenha")
+    public ResponseEntity<?> loginTest(@RequestBody LoginRequestDTO request) {
+
+        Optional<Usuario> usuario = authService.authenticate(
+                request.email(),
+                request.senha()
+        );
+        if (usuario.isPresent()) {
+            Usuario u = usuario.get();
+            return ResponseEntity.ok(
+                    new LoginResponseDTO(
+                            u.getId(),
+                            u.getNome(),
+                            u.getRole(),
+                            "Login bem-sucedido"
+                    )
+            );
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new LoginResponseMensagemDTO(
+                        "Email ou senha inválidos"
+                ));
     }
 }
